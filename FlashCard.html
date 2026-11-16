@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizQuest - Interactive Quiz Reviewer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --purple: #7155e8;
+            --pink: #ed72b5;
+            --dark: #211b38;
+            --muted: #77718e;
+            --bg: #f6f4ff;
+            --white: #fff;
+            --green: #20b982;
+            --red: #ed6478
+        }
+
+        body {
+            font-family: Poppins, sans-serif;
+            background: var(--bg);
+            color: var(--dark);
+            min-height: 100vh
+        }
+
+        button {
+            font: inherit;
+            cursor: pointer;
+            border: 0
+        }
+
+        header {
+            background: linear-gradient(120deg, #6549db, #9874f5, #ed80bd);
+            color: white;
+            padding: 27px 7%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: 800
+        }
+
+        .logo span {
+            color: #ffe38b
+        }
+
+        header p {
+            font-size: 12px;
+            opacity: .9
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px
+        }
+
+        .hero {
+            background: linear-gradient(120deg, #33265d, #684bd0);
+            color: white;
+            padding: 35px;
+            border-radius: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            overflow: hidden;
+            position: relative
+        }
+
+        .hero h1 {
+            font-size: clamp(25px, 4vw, 39px);
+            line-height: 1.2;
+            margin-bottom: 10px
+        }
+
+        .hero p {
+            opacity: .85;
+            font-size: 14px;
+            max-width: 520px
+        }
+
+        .hero-icon {
+            font-size: 85px;
+            animation: bob 3s infinite ease-in-out
+        }
+
+        @keyframes bob {
+            50% {
+                transform: translateY(-12px) rotate(5deg)
+            }
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 22px 0
+        }
+
+        .stat {
+            background: white;
+            border-radius: 17px;
+            padding: 18px;
+            text-align: center;
+            box-shadow: 0 5px 20px #33265d0c
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 25px;
+            color: var(--purple)
+        }
+
+        .stat span {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .section-title {
+            font-size: 21px;
+            margin: 28px 0 15px
+        }
+
+        .subjects {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px
+        }
+
+        .subject {
+            background: white;
+            padding: 20px;
+            border-radius: 18px;
+            text-align: left;
+            border: 2px solid transparent;
+            transition: .2s;
+            box-shadow: 0 5px 20px #33265d0b
+        }
+
+        .subject:hover,
+        .subject.selected {
+            transform: translateY(-4px);
+            border-color: var(--purple)
+        }
+
+        .subject .emoji {
+            font-size: 34px;
+            display: block;
+            margin-bottom: 10px
+        }
+
+        .subject strong {
+            display: block;
+            font-size: 15px
+        }
+
+        .subject small {
+            color: var(--muted)
+        }
+
+        .panel {
+            background: white;
+            padding: 23px;
+            border-radius: 20px;
+            margin-top: 20px;
+            box-shadow: 0 5px 20px #33265d0b
+        }
+
+        .levels {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px
+        }
+
+        .level {
+            padding: 16px;
+            border: 2px solid #eeeaf8;
+            border-radius: 15px;
+            background: white;
+            text-align: center;
+            transition: .2s
+        }
+
+        .level:hover,
+        .level.selected {
+            border-color: var(--purple);
+            background: #f5f1ff
+        }
+
+        .level strong {
+            display: block
+        }
+
+        .level small {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .primary {
+            background: linear-gradient(110deg, var(--purple), #a477f2);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 13px;
+            font-weight: 700;
+            box-shadow: 0 6px 15px #7155e844;
+            transition: .2s
+        }
+
+        .primary:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05)
+        }
+
+        .secondary {
+            background: #f0edfa;
+            color: var(--purple);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px
+        }
+
+        .hidden {
+            display: none !important
+        }
+
+        .quiz-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        .progress {
+            height: 9px;
+            background: #eeeaf8;
+            border-radius: 20px;
+            margin: 15px 0 25px;
+            overflow: hidden
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #7155e8, #ed80bd);
+            width: 0;
+            transition: .3s
+        }
+
+        .question {
+            font-size: 21px;
+            line-height: 1.5;
+            margin: 15px 0 22px
+        }
+
+        .choices {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px
+        }
+
+        .choice {
+            background: #f7f5fc;
+            border: 2px solid transparent;
+            border-radius: 14px;
+            padding: 16px;
+            text-align: left;
+            color: var(--dark);
+            transition: .2s
+        }
+
+        .choice:hover:not(:disabled) {
+            border-color: var(--purple);
+            background: #f0ecff
+        }
+
+        .choice.correct {
+            background: #e2f8ef;
+            border-color: var(--green);
+            color: #087b50
+        }
+
+        .choice.wrong {
+            background: #ffebee;
+            border-color: var(--red);
+            color: #b42d43
+        }
+
+        .feedback {
+            margin-top: 17px;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 14px
+        }
+
+        .feedback.good {
+            background: #e2f8ef;
+            color: #087b50
+        }
+
+        .feedback.bad {
+            background: #ffebee;
+            color: #b42d43
+        }
+
+        .flashcard {
+            perspective: 1000px;
+            max-width: 600px;
+            margin: 20px auto;
+            height: 260px;
+            cursor: pointer
+        }
+
+        .flash-inner {
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform .6s
+        }
+
+        .flashcard.flipped .flash-inner {
+            transform: rotateY(180deg)
+        }
+
+        .flash-face {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #7052df, #a578ee);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+            font-size: 22px;
+            font-weight: 600;
+            box-shadow: 0 10px 25px #7155e833
+        }
+
+        .flash-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #e879b2, #f39bc4);
+            font-size: 18px
+        }
+
+        .result {
+            text-align: center;
+            padding: 30px
+        }
+
+        .result .big {
+            font-size: 65px
+        }
+
+        .result h2 {
+            font-size: 30px;
+            margin: 10px
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--muted);
+            font-size: 12px
+        }
+
+        @media(max-width:750px) {
+            .subjects {
+                grid-template-columns: 1fr 1fr
+            }
+
+            .hero-icon {
+                font-size: 55px
+            }
+
+            .choices {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media(max-width:450px) {
+            .levels {
+                grid-template-columns: 1fr
+            }
+
+            .stats {
+                gap: 8px
+            }
+
+            .stat {
+                padding: 12px
+            }
+
+            .stat strong {
+                font-size: 20px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">🚀 Quiz<span>Quest</span></div>
+        <p>Learn • Practice • Improve</p>
+    </header>
+    <main>
+        <section id="home">
+            <div class="hero">
+                <div>
+                    <h1>Make learning<br>an adventure!</h1>
+                    <p>Study different subjects, test your knowledge, and challenge yourself with interactive quizzes
+                        and flashcards.</p>
+                </div>
+                <div class="hero-icon">🎓</div>
+            </div>
+            <div class="stats">
+                <div class="stat"><strong id="totalPlayed">0</strong><span>Questions Answered</span></div>
+                <div class="stat"><strong id="totalCorrect">0</strong><span>Correct Answers</span></div>
+                <div class="stat"><strong id="accuracy">0%</strong><span>Accuracy</span></div>
+            </div>
+            <h2 class="section-title">📚 Choose Your Subject</h2>
+            <div class="subjects" id="subjects"></div>
+            <div class="panel">
+                <h2 class="section-title" style="margin-top:0">🎯 Select Difficulty</h2>
+                <div class="levels" id="levels">
+                    <button class="level selected" data-level="Easy"><strong>🌱 Easy</strong><small>Beginner
+                            questions</small></button>
+                    <button class="level" data-level="Medium"><strong>⚡ Medium</strong><small>Intermediate
+                            questions</small></button>
+                    <button class="level" data-level="Hard"><strong>🔥 Hard</strong><small>Challenge
+                            yourself</small></button>
+                </div>
+                <div class="actions">
+                    <button class="primary" id="startQuiz">Start Quiz →</button>
+                    <button class="secondary" id="openFlash">📇 Study Flashcards</button>
+                </div>
+                <p style="font-size:12px;color:var(--muted);margin-top:12px">Each subject has 30 questions per
+                    difficulty. Questions and answer choices are shuffled every time you start.</p>
+            </div>
+        </section>
+
+        <section id="quiz" class="panel hidden">
+            <div class="quiz-top"><span id="quizLabel">Programming • Easy</span><span id="questionCount">Question 1 of
+                    30</span></div>
+            <div class="progress">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <h2 class="question" id="questionText"></h2>
+            <div class="choices" id="choices"></div>
+            <div id="feedback" class="hidden"></div>
+            <div class="actions">
+                <button class="primary hidden" id="nextQuestion">Next Question →</button>
+                <button class="secondary" id="quitQuiz">Exit Quiz</button>
+            </div>
+        </section>
+
+        <section id="flashSection" class="panel hidden">
+            <div class="quiz-top"><span id="flashLabel">Flashcards</span><span id="flashCount">1 / 30</span></div>
+            <h2 class="section-title">📇 Flashcard Study</h2>
+            <p style="text-align:center;color:var(--muted);font-size:12px">Tap the card to reveal the answer.</p>
+            <div class="flashcard" id="flashcard">
+                <div class="flash-inner">
+                    <div class="flash-face" id="flashFront">Question</div>
+                    <div class="flash-face flash-back" id="flashBack">Answer</div>
+                </div>
+            </div>
+            <div class="actions" style="justify-content:center">
+                <button class="secondary" id="flashPrev">← Previous</button>
+                <button class="primary" id="flashNext">Next →</button>
+                <button class="secondary" id="flashHome">Back Home</button>
+            </div>
+        </section>
+
+        <section id="result" class="panel hidden">
+            <div class="result">
+                <div class="big">🏆</div>
+                <h2>Quiz Completed!</h2>
+                <p id="resultMessage">Great job!</p>
+                <h2 id="finalScore" style="color:var(--purple)">0 / 30</h2>
+                <p id="finalAccuracy" style="color:var(--muted)"></p>
+                <div class="actions" style="justify-content:center">
+                    <button class="primary" id="retryQuiz">Try Again 🔄</button>
+                    <button class="secondary" id="resultHome">Back Home</button>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>QuizQuest © 2026 • Keep learning and keep growing! 💜</footer>
+
+    <script>
+        // Each entry is [answer, clue]. Every difficulty has 30 unique entries per subject.
+        const data = {
+            Programming: {
+                Easy: [
+                    ["HTML", "The standard markup language used to structure web pages."], ["CSS", "The language used to style and design web pages."], ["JavaScript", "The programming language commonly used to make web pages interactive."], ["Python", "A popular beginner-friendly programming language known for readable syntax."], ["Variable", "A named storage location for a value."], ["String", "A data type used to store text."], ["Integer", "A whole-number data type."], ["Boolean", "A data type that can be true or false."], ["Array", "A data structure that stores an ordered collection of values."], ["Function", "A reusable block of code that performs a task."], ["Loop", "A structure that repeats a block of code."], ["If statement", "A structure that runs code only when a condition is true."], ["Comment", "Text in source code that explains code and is ignored by the program."], ["Compiler", "A program that translates source code into another form, often machine code."], ["Bug", "An error or flaw in a program."], ["Debugging", "The process of finding and fixing errors in code."], ["IDE", "A software application that provides tools for writing and testing code."], ["Input", "Data provided to a program."], ["Output", "Information produced by a program."], ["Operator", "A symbol that performs an operation on values."], ["Syntax", "The rules that define how code must be written."], ["Algorithm", "A step-by-step procedure for solving a problem."], ["Database", "An organized collection of stored information."], ["Frontend", "The part of an application users see and interact with."], ["Backend", "The server-side part that handles data and application logic."], ["Browser", "An application used to access websites."], ["Tag", "An HTML element marker written inside angle brackets."], ["Pixel", "A tiny unit used to measure digital images and screen displays."], ["Git", "A version control system used to track changes in code."], ["Repository", "A storage location for a project's files and version history."]
+                ],
+                Medium: [
+                    ["Recursion", "A technique where a function calls itself to solve smaller versions of a problem."], ["Parameter", "A named input listed in a function definition."], ["Argument", "An actual value supplied when calling a function."], ["Return value", "The result a function sends back to its caller."], ["Object", "A data structure that groups related properties and values."], ["Class", "A blueprint used to create objects in object-oriented programming."], ["Inheritance", "An OOP feature where a class receives features from another class."], ["Encapsulation", "The practice of bundling data and methods while controlling access."], ["Polymorphism", "The ability for different objects to respond to the same interface in different ways."], ["API", "A defined interface that allows software systems to communicate."], ["JSON", "A lightweight text format for representing structured data."], ["HTTP", "A protocol used to transfer web resources between clients and servers."], ["SQL", "A language used to manage and query relational databases."], ["Primary key", "A field that uniquely identifies a row in a database table."], ["Foreign key", "A field that references a key in another or the same database table."], ["Exception", "An event that interrupts normal program execution."], ["Try-catch", "A structure used to handle exceptions."], ["Asynchronous code", "Code that allows tasks to progress without waiting for each task to finish in sequence."], ["Event listener", "Code that waits for a specific event and responds when it happens."], ["DOM", "The programming representation of a web document's structure."], ["Stack", "A data structure that follows last-in, first-out order."], ["Queue", "A data structure that follows first-in, first-out order."], ["Binary search", "A search method that repeatedly halves a sorted search range."], ["Merge sort", "A sorting algorithm that divides data and merges sorted sections."], ["Big O", "A notation used to describe how an algorithm's resource use grows."], ["Unit test", "A test that checks one small part of a program."], ["Framework", "A reusable structure and set of tools for building applications."], ["Middleware", "Software that processes requests between two application components."], ["Environment variable", "A configuration value provided outside the source code."], ["Responsive design", "An approach that adapts a website layout to different screen sizes."]
+                ],
+                Hard: [
+                    ["Race condition", "A bug where the result depends on the unpredictable timing of concurrent operations."], ["Deadlock", "A state where processes wait indefinitely for resources held by one another."], ["Memoization", "An optimization that stores previous function results for reuse."], ["Dynamic programming", "A method that solves overlapping subproblems and stores their results."], ["Dijkstra's algorithm", "An algorithm that finds shortest paths from one source with nonnegative edge weights."], ["A* search", "A pathfinding algorithm that combines path cost and a heuristic estimate."], ["Hash collision", "An event where different keys produce the same hash value."], ["Hash table", "A data structure that maps keys to values using a hash function."], ["Garbage collection", "Automatic memory management that reclaims unreachable objects."], ["Memory leak", "Memory that remains allocated when a program no longer needs it."], ["Time complexity", "A measure of how an algorithm's running time grows with input size."], ["Space complexity", "A measure of how an algorithm's memory use grows with input size."], ["AVL tree", "A self-balancing binary search tree with tightly controlled height difference."], ["Red-black tree", "A self-balancing binary search tree that uses node colors to maintain balance."], ["Graph", "A structure made of vertices connected by edges."], ["Topological sorting", "A linear ordering of directed acyclic graph vertices respecting edge directions."], ["Breadth-first search", "A graph traversal that explores neighboring vertices level by level."], ["Depth-first search", "A graph traversal that explores a path deeply before backtracking."], ["P versus NP", "A major complexity question about efficiently solving and verifying problems."], ["ACID", "The four database transaction properties: atomicity, consistency, isolation, and durability."], ["Normalization", "The database design process that reduces redundancy and update anomalies."], ["Index", "A database structure that can speed up data retrieval."], ["REST", "An architectural style for networked applications based on resources and standard operations."], ["OAuth", "An authorization framework that allows limited access without sharing a password."], ["JWT", "A compact token format often used to transmit signed claims."], ["Dependency injection", "A design technique where required dependencies are supplied from outside a component."], ["Microservices", "An architecture built from small, independently deployable services."], ["Load balancing", "The distribution of incoming work across multiple servers or resources."], ["Caching", "Storing reusable results so future requests can be served faster."], ["Cryptographic hash", "A one-way function that maps input data to a fixed-size digest."]
+                ]
+            },
+            Math: {
+                Easy: [
+                    ["12", "The result of 7 + 5."], ["15", "The result of 3 × 5."], ["9", "The result of 45 ÷ 5."], ["20", "The result of 4 × 5."], ["8", "The result of 16 ÷ 2."], ["25", "The square of 5."], ["100", "The number of centimeters in one meter."], ["60", "The number of minutes in one hour."], ["90°", "The measure of a right angle."], ["Triangle", "A polygon with exactly three sides."], ["Square", "A quadrilateral with four equal sides and four right angles."], ["Circle", "A plane shape whose points are equally distant from its center."], ["Perimeter", "The total distance around a two-dimensional shape."], ["Area", "The amount of surface covered by a two-dimensional shape."], ["Fraction", "A number representing part of a whole using a numerator and denominator."], ["Numerator", "The top number in a fraction."], ["Denominator", "The bottom number in a fraction."], ["Even number", "An integer divisible by 2 with no remainder."], ["Odd number", "An integer that is not divisible by 2 evenly."], ["Prime number", "A whole number greater than 1 with exactly two positive factors."], ["0", "The additive identity: adding it does not change a number."], ["1", "The multiplicative identity: multiplying by it does not change a number."], ["10", "The result of 100 ÷ 10."], ["50%", "The percentage equivalent of one half."], ["1/4", "The fraction equivalent to 25 percent."], ["Decimal", "A number written using a base-ten point notation."], ["Mean", "The average found by adding values and dividing by their count."], ["Median", "The middle value when a data set is arranged in order."], ["Mode", "The value that occurs most often in a data set."], ["Perpendicular", "Lines that intersect to form a right angle."]
+                ],
+                Medium: [
+                    ["x = 5", "The solution of 2x + 3 = 13."], ["x = 4", "The solution of 3x - 2 = 10."], ["x = 6", "The solution of x/2 = 3."], ["36", "The value of 6 squared."], ["64", "The value of 4 cubed."], ["180°", "The sum of the interior angles of a triangle."], ["360°", "The sum of the interior angles of a quadrilateral."], ["πr²", "The formula for the area of a circle with radius r."], ["2πr", "The formula for the circumference of a circle."], ["½bh", "The formula for the area of a triangle."], ["a² + b² = c²", "The Pythagorean theorem for a right triangle."], ["Slope", "The ratio of vertical change to horizontal change between two points."], ["y = mx + b", "The slope-intercept form of a straight-line equation."], ["Positive slope", "A line that rises from left to right."], ["-3", "The slope of a line perpendicular to a line with slope 1/3."], ["Probability", "A measure of how likely an event is to occur."], ["0.25", "The probability of rolling a 1 on a fair four-sided die."], ["2:3", "The simplified ratio of 10 to 15."], ["15", "The result of 20% of 75."], ["125", "The result of increasing 100 by 25%."], ["Composite number", "A whole number greater than 1 with more than two positive factors."], ["Irrational number", "A real number that cannot be expressed as a ratio of integers."], ["Function", "A relation that assigns exactly one output to each input."], ["Domain", "The set of all allowed input values of a function."], ["Range", "The set of output values produced by a function."], ["Median", "The middle observation in an ordered data set."], ["Standard deviation", "A measure of how spread out values are around the mean."], ["Permutation", "An arrangement where order matters."], ["Combination", "A selection where order does not matter."], ["45°", "The acute angle complementary to a 45-degree angle."]
+                ],
+                Hard: [
+                    ["x = 3", "The solution of x² - 5x + 6 = 0 that is larger than 2."], ["x = -2", "The solution of 2x + 4 = 0."], ["-1", "The derivative of -x with respect to x."], ["2x", "The derivative of x² with respect to x."], ["3x²", "The derivative of x³ with respect to x."], ["ln(x)", "An antiderivative of 1/x for positive x."], ["x²/2 + C", "The general antiderivative of x."], ["1/3", "The definite integral of x² from 0 to 1."], ["e", "The base of the natural logarithm."], ["0", "The limit of 1/x as x approaches positive infinity."], ["2", "The determinant of the matrix [[1,2],[3,4]] is negative; its absolute value is what?"], ["-2", "The determinant of the matrix [[1,2],[3,4]]."], ["Eigenvalue", "A scalar that scales an eigenvector under a linear transformation."], ["Vector", "A quantity with magnitude and direction."], ["Scalar", "A quantity with magnitude but no direction."], ["Gradient", "A vector of partial derivatives pointing toward the greatest rate of increase."], ["Bayes' theorem", "A rule for updating conditional probability using new evidence."], ["Normal distribution", "A symmetric, bell-shaped probability distribution defined by mean and variance."], ["Null hypothesis", "A statistical statement commonly tested as the default assumption."], ["P-value", "The probability, assuming the null hypothesis, of results at least as extreme as observed."], ["L'Hôpital's rule", "A method for certain indeterminate limits using derivatives of numerator and denominator."], ["Taylor series", "A representation of a function as an infinite sum of terms based on derivatives."], ["Complex number", "A number that can be written as a + bi, where i² = -1."], ["i", "The imaginary unit whose square equals -1."], ["Determinant", "A scalar value associated with a square matrix."], ["Injective", "A function where distinct inputs always have distinct outputs."], ["Surjective", "A function whose range equals its codomain."], ["Bijective", "A function that is both injective and surjective."], ["Convergent series", "An infinite series whose sequence of partial sums approaches a finite limit."], ["Derivative", "The instantaneous rate of change of a function."]
+                ]
+            },
+            History: {
+                Easy: [
+                    ["Ancient Egypt", "The civilization famous for pyramids and pharaohs along the Nile."], ["Great Wall of China", "A vast defensive structure built across northern China over many centuries."], ["Renaissance", "A European cultural movement that revived interest in classical art and learning."], ["World War I", "The global conflict that began in 1914 and ended in 1918."], ["World War II", "The global conflict that lasted from 1939 to 1945."], ["Julius Caesar", "A Roman general and dictator assassinated in 44 BCE."], ["Cleopatra", "The last active ruler of the Ptolemaic Kingdom of Egypt."], ["Abraham Lincoln", "The U.S. president who led the country during the American Civil War."], ["George Washington", "The first president of the United States."], ["Machu Picchu", "An Inca site located high in the Andes of Peru."], ["Silk Road", "A network of trade routes connecting East Asia with regions farther west."], ["Magna Carta", "A 1215 English charter that limited some powers of the king."], ["French Revolution", "The revolution that began in France in 1789."], ["Industrial Revolution", "A period of major change involving machines, factories, and manufacturing."], ["Christopher Columbus", "The navigator whose 1492 voyage connected Europe and the Americas in sustained contact."], ["Ancient Greece", "A civilization known for city-states such as Athens and Sparta."], ["Sparta", "An ancient Greek city-state known for its military-focused society."], ["Athens", "An ancient Greek city-state associated with early democracy."], ["Roman Empire", "The ancient state centered on Rome that controlled lands around the Mediterranean."], ["Pyramids of Giza", "Monumental ancient Egyptian tombs built for pharaohs."], ["Black Death", "A devastating plague pandemic that struck Europe in the 14th century."], ["Joan of Arc", "A French heroine who supported Charles VII during the Hundred Years' War."], ["Vikings", "Seafaring people from Scandinavia active during the early medieval period."], ["Mesopotamia", "An ancient region between the Tigris and Euphrates rivers."], ["Code of Hammurabi", "An ancient Babylonian collection of laws."], ["Declaration of Independence", "The 1776 document announcing the American colonies' separation from Britain."], ["Bastille", "A Paris fortress and prison stormed in 1789 during the French Revolution."], ["Apartheid", "A system of institutionalized racial segregation in South Africa."], ["Nelson Mandela", "A South African anti-apartheid leader who became president in 1994."], ["United Nations", "An international organization founded in 1945 to promote cooperation and peace."]
+                ],
+                Medium: [
+                    ["Treaty of Versailles", "The 1919 treaty that formally ended the state of war between Germany and the Allied Powers after World War I."], ["Cold War", "The prolonged geopolitical rivalry between the United States and the Soviet Union."], ["Berlin Wall", "The barrier that divided East and West Berlin from 1961 until 1989."], ["Cuban Missile Crisis", "The 1962 confrontation involving Soviet missiles in Cuba and the United States."], ["Meiji Restoration", "The 1868 political transformation that restored imperial rule and accelerated Japan's modernization."], ["Opium Wars", "Conflicts between Qing China and Britain, followed by other powers, over trade and influence."], ["Boxer Rebellion", "An anti-foreign and anti-Christian uprising in China around 1899–1901."], ["Haitian Revolution", "The uprising that led to Haiti's independence from France in 1804."], ["American Civil War", "The 1861–1865 conflict between the Union and the Confederacy."], ["Emancipation Proclamation", "Lincoln's 1863 order declaring enslaved people in rebelling areas free."], ["Russian Revolution", "The 1917 revolutions that ended imperial rule and brought Bolsheviks to power."], ["October Revolution", "The 1917 Bolshevik seizure of power in Russia."], ["Great Depression", "A severe worldwide economic downturn that began in 1929."], ["New Deal", "Franklin D. Roosevelt's programs aimed at recovery from the Great Depression."], ["D-Day", "The Allied landings in Normandy on June 6, 1944."], ["Marshall Plan", "The U.S. program that provided economic aid to rebuild postwar Europe."], ["NATO", "A military alliance founded in 1949 by North American and European countries."], ["Warsaw Pact", "A Soviet-led military alliance formed in 1955 during the Cold War."], ["Suez Crisis", "The 1956 conflict following Egypt's nationalization of the Suez Canal."], ["Cultural Revolution", "Mao Zedong's political campaign in China launched in 1966."], ["Tiananmen protests", "The 1989 demonstrations in Beijing centered on political and social reforms."], ["Glorious Revolution", "The 1688–1689 change of power in England that strengthened parliamentary authority."], ["Congress of Vienna", "The 1814–1815 meeting that reorganized Europe after the Napoleonic Wars."], ["Napoleonic Code", "The civil code established in France under Napoleon in 1804."], ["Thirty Years' War", "A major European conflict fought from 1618 to 1648."], ["Peace of Westphalia", "The 1648 treaties that ended the Thirty Years' War."], ["Suffrage movement", "The campaign to secure voting rights, especially for women."], ["Seneca Falls Convention", "The 1848 women's rights convention held in New York."], ["Berlin Conference", "The 1884–1885 meeting where European powers formalized rules for colonizing Africa."], ["Decolonization", "The process by which colonies gained independence from imperial powers."]
+                ],
+                Hard: [
+                    ["Peace of Augsburg", "The 1555 agreement that allowed rulers in the Holy Roman Empire to choose Catholicism or Lutheranism for their territories."], ["Edict of Nantes", "The 1598 decree that granted French Protestants limited religious toleration."], ["Diet of Worms", "The 1521 assembly where Martin Luther was called to recant his teachings."], ["Council of Trent", "The Catholic council that helped define the Counter-Reformation from 1545 to 1563."], ["Pragmatic Sanction of 1713", "The Habsburg decree intended to allow Maria Theresa to inherit Habsburg lands."], ["War of Spanish Succession", "The 1701–1714 conflict over who would inherit the Spanish throne."], ["Seven Years' War", "The 1756–1763 global conflict involving major European powers and overseas colonies."], ["Treaty of Utrecht", "The 1713 treaty series that helped end the War of Spanish Succession."], ["Taiping Rebellion", "A massive Chinese civil war from 1850 to 1864 led by Hong Xiuquan."], ["Self-Strengthening Movement", "A late Qing effort to adopt Western technology while preserving Chinese institutions."], ["Scramble for Africa", "The rapid European colonization and partition of Africa during the late 19th century."], ["Berlin Act", "The 1885 agreement that set rules for European claims in parts of Africa."], ["Young Turk Revolution", "The 1908 movement that restored the Ottoman constitution."], ["Balfour Declaration", "The 1917 British statement supporting a national home for Jewish people in Palestine."], ["Sykes-Picot Agreement", "The secret 1916 agreement outlining British and French spheres of influence in Ottoman lands."], ["Zimmermann Telegram", "The 1917 German message proposing a military alliance with Mexico against the United States."], ["Bretton Woods Conference", "The 1944 meeting that established key structures of the postwar international monetary system."], ["Yalta Conference", "The February 1945 meeting of Roosevelt, Churchill, and Stalin about postwar Europe."], ["Potsdam Conference", "The 1945 meeting of Allied leaders that addressed the postwar settlement."], ["Nuremberg Trials", "The post-World War II trials of major Nazi leaders for war crimes and related offenses."], ["Non-Aligned Movement", "A group of states that sought to avoid formal alignment with Cold War power blocs."], ["Prague Spring", "The 1968 Czechoslovak reform movement ended by a Warsaw Pact invasion."], ["Brezhnev Doctrine", "The Soviet policy claim used to justify intervention in socialist states to protect communist rule."], ["Camp David Accords", "The 1978 agreements that created a framework for peace between Egypt and Israel."], ["Iranian Revolution", "The 1979 revolution that overthrew Iran's monarchy and established an Islamic Republic."], ["Solidarity", "The Polish trade union and social movement that challenged communist rule."], ["Glasnost", "Gorbachev's policy of greater openness in the Soviet Union."], ["Perestroika", "Gorbachev's policy of restructuring the Soviet economy and political system."], ["Treaty of Maastricht", "The 1992 treaty that established the European Union."], ["Rwandan genocide", "The 1994 mass killing of Tutsi and moderate Hutu people in Rwanda."]
+                ]
+            },
+            Science: {
+                Easy: [
+                    ["Atom", "The basic unit of a chemical element that retains its identity."], ["Molecule", "A group of two or more atoms held together by chemical bonds."], ["Water", "The compound with the chemical formula H₂O."], ["Oxygen", "The gas that humans need for aerobic respiration."], ["Carbon dioxide", "The gas plants use as a carbon source during photosynthesis."], ["Photosynthesis", "The process plants use to convert light energy into chemical energy."], ["Gravity", "The attractive interaction between objects with mass."], ["Force", "A push or pull that can change an object's motion."], ["Energy", "The capacity to do work or cause change."], ["Evaporation", "The change of a liquid into a gas at its surface."], ["Condensation", "The change of a gas into a liquid."], ["Solid", "A state of matter with a definite shape and volume."], ["Liquid", "A state of matter with a definite volume but no fixed shape."], ["Gas", "A state of matter that expands to fill its container."], ["Cell", "The basic structural and functional unit of life."], ["Nucleus", "The cell structure that contains most of a eukaryotic cell's DNA."], ["Heart", "The organ that pumps blood through the circulatory system."], ["Lungs", "The organs primarily responsible for gas exchange in humans."], ["Brain", "The organ that coordinates thought, movement, and many body functions."], ["Skeleton", "The body's framework of bones."], ["Ecosystem", "A community of organisms interacting with their physical environment."], ["Producer", "An organism that makes its own food, often using sunlight."], ["Consumer", "An organism that obtains energy by eating other organisms."], ["Habitat", "The natural place where an organism lives."], ["Planet", "A large celestial body that orbits a star and meets specific astronomical criteria."], ["Sun", "The star at the center of our solar system."], ["Moon", "Earth's natural satellite."], ["Thermometer", "An instrument used to measure temperature."], ["Magnet", "An object that produces a magnetic field."], ["Sound wave", "A mechanical wave that travels through a medium."]
+                ],
+                Medium: [
+                    ["Mitochondrion", "The organelle where much of a eukaryotic cell's ATP is produced."], ["Ribosome", "The cell structure that builds proteins from amino acids."], ["Chloroplast", "The plant-cell organelle where photosynthesis occurs."], ["Osmosis", "The movement of water across a selectively permeable membrane."], ["Diffusion", "The net movement of particles from higher to lower concentration."], ["Mitosis", "Cell division that produces two genetically similar daughter cells."], ["Meiosis", "Cell division that produces haploid cells for sexual reproduction."], ["DNA", "The molecule that stores hereditary genetic information."], ["RNA", "A nucleic acid involved in gene expression and protein synthesis."], ["Enzyme", "A biological catalyst that speeds up chemical reactions."], ["Homeostasis", "The maintenance of relatively stable internal conditions."], ["Natural selection", "The process where heritable traits affecting reproduction become more or less common."], ["Adaptation", "An inherited feature that can improve an organism's survival or reproduction."], ["Food chain", "A sequence showing how energy passes between organisms through feeding."], ["Trophic level", "An organism's feeding position in a food chain or food web."], ["pH", "A scale commonly used to describe how acidic or basic an aqueous solution is."], ["Isotope", "Atoms of the same element with different numbers of neutrons."], ["Ionic bond", "A chemical bond involving electrostatic attraction between oppositely charged ions."], ["Covalent bond", "A chemical bond formed when atoms share electron pairs."], ["Periodic table", "An arrangement of chemical elements by atomic number and recurring properties."], ["Atomic number", "The number of protons in an atom's nucleus."], ["Mass number", "The total number of protons and neutrons in an atomic nucleus."], ["Newton's first law", "The law stating that an object maintains its state of motion unless acted on by a net external force."], ["Velocity", "Displacement per unit time, including direction."], ["Acceleration", "The rate of change of velocity over time."], ["Wavelength", "The distance between corresponding points on consecutive waves."], ["Frequency", "The number of wave cycles passing a point per unit time."], ["Refraction", "The change in direction of a wave as it enters a different medium."], ["Conduction", "Heat transfer through direct contact between particles or objects."], ["Convection", "Heat transfer through the movement of fluids."]
+                ],
+                Hard: [
+                    ["Mendelian inheritance", "The inheritance patterns described by Gregor Mendel using discrete hereditary factors."], ["Codon", "A sequence of three nucleotides that specifies an amino acid or stop signal."], ["Transcription", "The process of making RNA from a DNA template."], ["Translation", "The process by which ribosomes use mRNA information to build a protein."], ["CRISPR-Cas9", "A gene-editing system adapted from a bacterial defense mechanism."], ["Epigenetics", "The study of heritable changes in gene activity that do not alter DNA sequence."], ["Hardy-Weinberg principle", "A model describing conditions under which allele frequencies remain constant in a population."], ["Genetic drift", "Random changes in allele frequencies, especially influential in small populations."], ["Founder effect", "A form of genetic drift caused when a new population starts from a small group."], ["Allopatric speciation", "The formation of new species after populations become geographically separated."], ["Endosymbiotic theory", "The theory that mitochondria and chloroplasts originated from free-living bacteria."], ["Krebs cycle", "A series of reactions that oxidizes acetyl-CoA and generates energy carriers."], ["Electron transport chain", "A series of membrane proteins that transfer electrons and help generate a proton gradient."], ["Oxidative phosphorylation", "ATP production driven by the proton gradient generated by electron transport."], ["Competitive inhibition", "Enzyme inhibition where a molecule competes with the substrate for the active site."], ["Le Chatelier's principle", "A system at equilibrium shifts to oppose an imposed change."], ["Activation energy", "The minimum energy required for a reaction to proceed."], ["Entropy", "A thermodynamic quantity related to energy dispersal and the number of possible microscopic arrangements."], ["Enthalpy", "A thermodynamic state function equal to internal energy plus pressure-volume product."], ["Electronegativity", "An atom's tendency to attract shared electrons in a chemical bond."], ["Coulomb's law", "The law describing electrostatic force between charged particles."], ["Ohm's law", "The relationship V = IR between voltage, current, and resistance."], ["Faraday's law", "A law relating changing magnetic flux to induced electromotive force."], ["Quantum superposition", "The principle that a quantum system can be described as a combination of possible states."], ["Heisenberg uncertainty principle", "A principle limiting how precisely certain pairs of physical properties can be known together."], ["Special relativity", "Einstein's theory describing space and time for observers in inertial frames."], ["Redshift", "An increase in observed wavelength, often associated with a source moving away."], ["Plate tectonics", "The theory that Earth's lithosphere is divided into moving plates."], ["Radiometric dating", "A method of estimating age using predictable radioactive decay."], ["Natural logarithm", "The logarithm with base e, commonly used in growth and decay models."]
+                ]
+            }
+        };
+
+        // App state
+        const subjectInfo = [
+            {name: "Programming", icon: "💻", description: "Code and technology"},
+            {name: "Math", icon: "➗", description: "Numbers and equations"},
+            {name: "History", icon: "🏛️", description: "Events and civilizations"},
+            {name: "Science", icon: "🔬", description: "Discover how things work"}
+        ];
+        let selectedSubject = "Programming", selectedLevel = "Easy";
+        let questions = [], questionIndex = 0, score = 0, answered = false;
+        let flashcards = [], flashIndex = 0;
+        let totalPlayed = 0, totalCorrect = 0;
+
+        const $ = id => document.getElementById(id);
+        function shuffle(array) {
+            const a = [...array];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+        function show(section) {
+            ["home", "quiz", "flashSection", "result"].forEach(id => $(id).classList.toggle("hidden", id !== section));
+            window.scrollTo({top: 0, behavior: "smooth"});
+        }
+        function renderSubjects() {
+            $("subjects").innerHTML = subjectInfo.map(s => `
+ <button class="subject ${selectedSubject === s.name ? "selected" : ""}" data-subject="${s.name}">
+ <span class="emoji">${s.icon}</span><strong>${s.name}</strong><small>${s.description}</small>
+ </button>`).join("");
+            document.querySelectorAll(".subject").forEach(btn => btn.onclick = () => {
+                selectedSubject = btn.dataset.subject; renderSubjects();
+            });
+        }
+        document.querySelectorAll(".level").forEach(btn => btn.onclick = () => {
+            selectedLevel = btn.dataset.level;
+            document.querySelectorAll(".level").forEach(b => b.classList.toggle("selected", b === btn));
+        });
+        function updateStats() {
+            $("totalPlayed").textContent = totalPlayed;
+            $("totalCorrect").textContent = totalCorrect;
+            $("accuracy").textContent = totalPlayed ? Math.round(totalCorrect / totalPlayed * 100) + "%" : "0%";
+        }
+        function makeQuestions() {
+            const source = data[selectedSubject][selectedLevel];
+            return shuffle(source.map((entry, index) => ({
+                clue: entry[1], answer: entry[0],
+                options: shuffle([entry[0], ...shuffle(source.filter((_, i) => i !== index).map(x => x[0])).slice(0, 3)])
+            })));
+        }
+        function startQuiz() {
+            questions = makeQuestions();
+            questionIndex = 0; score = 0;
+            $("quizLabel").textContent = selectedSubject + " • " + selectedLevel;
+            show("quiz"); renderQuestion();
+        }
+        function renderQuestion() {
+            answered = false;
+            const q = questions[questionIndex];
+            $("questionCount").textContent = `Question ${questionIndex + 1} of ${questions.length}`;
+            $("progressBar").style.width = (questionIndex / questions.length * 100) + "%";
+            $("questionText").textContent = "Which answer best matches this description? " + q.clue;
+            $("choices").innerHTML = "";
+            $("feedback").className = "hidden"; $("feedback").textContent = "";
+            $("nextQuestion").classList.add("hidden");
+            q.options.forEach((option, i) => {
+                const btn = document.createElement("button");
+                btn.className = "choice";
+                btn.textContent = String.fromCharCode(65 + i) + ". " + option;
+                btn.onclick = () => chooseAnswer(btn, option, q.answer);
+                $("choices").appendChild(btn);
+            });
+        }
+        function chooseAnswer(button, choice, answer) {
+            if (answered) return;
+            answered = true; totalPlayed++;
+            const correct = choice === answer;
+            if (correct) {score++; totalCorrect++;}
+            updateStats();
+            document.querySelectorAll(".choice").forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent.slice(3) === answer) btn.classList.add("correct");
+            });
+            if (!correct) button.classList.add("wrong");
+            const feedback = $("feedback");
+            feedback.className = "feedback " + (correct ? "good" : "bad");
+            feedback.textContent = correct ? "🎉 Correct! Great job!" : "❌ Not quite! The correct answer is: " + answer;
+            $("nextQuestion").textContent = questionIndex === questions.length - 1 ? "See Results 🏆" : "Next Question →";
+            $("nextQuestion").classList.remove("hidden");
+        }
+        function nextQuestion() {
+            questionIndex++;
+            if (questionIndex >= questions.length) {finishQuiz(); return;}
+            renderQuestion();
+        }
+        function finishQuiz() {
+            $("progressBar").style.width = "100%";
+            const percent = Math.round(score / questions.length * 100);
+            $("finalScore").textContent = score + " / " + questions.length;
+            $("finalAccuracy").textContent = "Your accuracy: " + percent + "%";
+            $("resultMessage").textContent = percent >= 80 ? "Excellent work! You're a QuizQuest champion! 🏆" : percent >= 50 ? "Good effort! Keep practicing and improving! 🌟" : "Keep going! Every attempt helps you learn. 💪";
+            show("result");
+        }
+        function openFlashcards() {
+            flashcards = shuffle(data[selectedSubject][selectedLevel]);
+            flashIndex = 0; renderFlashcard(); show("flashSection");
+        }
+        function renderFlashcard() {
+            const item = flashcards[flashIndex];
+            $("flashLabel").textContent = selectedSubject + " • " + selectedLevel;
+            $("flashCount").textContent = (flashIndex + 1) + " / " + flashcards.length;
+            $("flashFront").textContent = item[1];
+            $("flashBack").textContent = item[0];
+            $("flashcard").classList.remove("flipped");
+        }
+        $("flashcard").onclick = () => $("flashcard").classList.toggle("flipped");
+        $("flashNext").onclick = () => {flashIndex = (flashIndex + 1) % flashcards.length; renderFlashcard();};
+        $("flashPrev").onclick = () => {flashIndex = (flashIndex - 1 + flashcards.length) % flashcards.length; renderFlashcard();};
+        $("flashHome").onclick = () => show("home");
+        $("startQuiz").onclick = startQuiz;
+        $("openFlash").onclick = openFlashcards;
+        $("nextQuestion").onclick = nextQuestion;
+        $("quitQuiz").onclick = () => show("home");
+        $("retryQuiz").onclick = startQuiz;
+        $("resultHome").onclick = () => show("home");
+        renderSubjects(); updateStats();
+    </script>
+</body>
+
+</html>
